@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"slices"
+	"sync"
 	"syscall"
 )
 
@@ -65,11 +66,11 @@ func main() {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	exitChan := make(chan struct{})
-	defer close(exitChan)
+    var wg sync.WaitGroup
 
+    wg.Add(len(ports))
 	for _, r := range ports {
-		go ListenAndLog(ctx, exitChan, r)
+		go ListenAndLog(ctx, &wg, r)
 	}
 
 	// Listen for interrupt
@@ -81,5 +82,5 @@ func main() {
         cancel()
         return
 	}()
-	<-exitChan
+    wg.Wait()
 }
