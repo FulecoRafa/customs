@@ -12,12 +12,24 @@ import (
 	"syscall"
 )
 
-func setDebugLevel() {
+func setLogger() {
 	lvl := new(slog.LevelVar)
 	lvl.Set(slog.LevelDebug)
-	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: lvl,
-	})
+    var handler slog.Handler
+    var options *slog.HandlerOptions
+    if isDebug {
+        options = &slog.HandlerOptions{
+            Level: lvl,
+        }
+    }
+    switch logFormat {
+    case "kv":
+        handler = slog.NewTextHandler(os.Stdout, options)
+    case "json":
+        handler = slog.NewJSONHandler(os.Stdout, options)
+    default:
+        panic(fmt.Sprintf("Unsupported log format: %s", logFormat))
+    }
 
 	logger := slog.New(handler)
 
@@ -30,12 +42,16 @@ var ports Redirects
 
 var outputFormat string
 
+var logFormat string
+
 func init() {
 	flag.StringVar(&outputFormat, "o", "http", "The output format of logs. One of: curl; http")
 	flag.StringVar(&outputFormat, "output", "http", "The output format of logs. One of: curl; http")
 	flag.Var(&ports, "r", "Lists of ports redirecting to URLs in format 'port:url'")
 	flag.Var(&ports, "redirect", "Lists of ports redirecting to URLs in format 'port:url'")
 	flag.BoolVar(&isDebug, "debug", false, "Print debug logs")
+    flag.StringVar(&logFormat, "l", "kv", "Log format. One of: json; kv")
+    flag.StringVar(&logFormat, "logs", "kv", "Log format. One of: json; kv")
 }
 
 var formats = []string{
@@ -50,9 +66,7 @@ func checkFormat() bool {
 func main() {
 	flag.Parse()
 
-	if isDebug {
-		setDebugLevel()
-	}
+    setLogger()
 
 	slog.Debug("Starting application", "ports", ports, "outputFormat", outputFormat)
 
@@ -82,6 +96,5 @@ func main() {
         cancel()
         return
 	}()
-
     wg.Wait()
 }

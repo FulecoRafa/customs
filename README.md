@@ -25,6 +25,19 @@ customs -h
 #### `-o|--output [format]`
 The output format of logs. One of: curl; http (default "http")
 
+#### `-l|--logs [format]`
+Log format. One of: json; kv (default "kv")
+
+##### `kv`
+```
+time=2023-12-13T07:55:33.780-03:00 level=DEBUG msg="Starting application" ports="[7070 -> localhost:6969]" outputFormat=http
+```
+
+##### `json`
+```
+{"time":"2023-12-13T07:55:40.611606-03:00","level":"DEBUG","msg":"Starting application","ports":[{"Port":7070,"Destination":"localhost:6969"}],"outputFormat":"http"}
+```
+
 #### `-r|--redirect [redirect string]`
 Lists of ports redirecting to URLs in format `port:url`
 
