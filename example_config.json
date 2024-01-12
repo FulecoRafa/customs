@@ -1,0 +1,8 @@
+{
+    "plugins": [
+        {
+            "name": "log",
+            "path": "./plugins/build/log.plugin"
+        }
+    ]
+}
