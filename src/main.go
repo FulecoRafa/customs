@@ -7,9 +7,10 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"slices"
 	"sync"
 	"syscall"
+
+	"github.com/FulecoRafa/customs/lib"
 )
 
 func setLogger() {
@@ -38,9 +39,8 @@ func setLogger() {
 
 var isDebug bool
 
-var ports Redirects
-
 var outputFormat string
+var ports lib.Redirects
 
 var logFormat string
 
@@ -68,8 +68,6 @@ func main() {
 
     setLogger()
 
-	slog.Debug("Starting application", "ports", ports, "outputFormat", outputFormat)
-
 	if len(ports) == 0 {
 		fmt.Println("Nothing to do")
 		return
@@ -84,7 +82,7 @@ func main() {
 
     wg.Add(len(ports))
 	for _, r := range ports {
-		go ListenAndLog(ctx, &wg, r)
+		go Listen(ctx, &wg, r)
 	}
 
 	// Listen for interrupt

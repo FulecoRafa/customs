@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"flag"
@@ -43,13 +43,13 @@ var _ flag.Value = &Redirects{}
 func ParseRedirect(str string) (Redirect, error) {
 	parts := strings.SplitN(str, ":", 2)
 	if len(parts) != 2 {
-		fmt.Errorf("Failed to parse %s", str)
+		return Redirect{}, fmt.Errorf("Failed to parse %s", str)
 	}
 	port := parts[0]
 	url := parts[1]
 	portNum, err := strconv.ParseInt(port, 10, 64)
 	if err != nil {
-		fmt.Errorf("Could not parse redirection: %s is not a number", port)
+		return Redirect{}, fmt.Errorf("Could not parse redirection: %s is not a number", port)
 	}
 	return Redirect{
 		Port:        portNum,

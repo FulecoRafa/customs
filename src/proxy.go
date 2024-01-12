@@ -9,6 +9,8 @@ import (
 	"net/http/httputil"
 	"strings"
 	"sync"
+
+	"github.com/FulecoRafa/customs/lib"
 )
 
 var idLock sync.Mutex
@@ -57,7 +59,7 @@ func CopyHeaders(src http.Header, dst *http.Header) {
 }
 
 type proxy struct {
-	redirect Redirect
+	redirect lib.Redirect
 }
 
 // Hop-by-hop headers. These are removed when sent to the backend.
@@ -138,7 +140,7 @@ func (p *proxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 var _ http.Handler = &proxy{}
 
-func ListenAndLog(ctx context.Context, wg *sync.WaitGroup, r Redirect) {
+func Listen(ctx context.Context, wg *sync.WaitGroup, r lib.Redirect) {
     p := &proxy {
         redirect: r,
     }
