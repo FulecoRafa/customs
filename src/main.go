@@ -14,11 +14,11 @@ import (
 )
 
 func setLogger() {
-	lvl := new(slog.LevelVar)
-	lvl.Set(slog.LevelDebug)
     var handler slog.Handler
     var options *slog.HandlerOptions
     if isDebug {
+        lvl := new(slog.LevelVar)
+        lvl.Set(slog.LevelDebug)
         options = &slog.HandlerOptions{
             Level: lvl,
         }
@@ -39,14 +39,11 @@ func setLogger() {
 
 var isDebug bool
 
-var outputFormat string
 var ports lib.Redirects
 
 var logFormat string
 
 func init() {
-	flag.StringVar(&outputFormat, "o", "http", "The output format of logs. One of: curl; http")
-	flag.StringVar(&outputFormat, "output", "http", "The output format of logs. One of: curl; http")
 	flag.Var(&ports, "r", "Lists of ports redirecting to URLs in format 'port:url'")
 	flag.Var(&ports, "redirect", "Lists of ports redirecting to URLs in format 'port:url'")
 	flag.BoolVar(&isDebug, "debug", false, "Print debug logs")
@@ -54,13 +51,7 @@ func init() {
     flag.StringVar(&logFormat, "logs", "kv", "Log format. One of: json; kv")
 }
 
-var formats = []string{
-	"curl",
-	"http",
-}
 
-func checkFormat() bool {
-	return slices.Contains(formats, outputFormat)
 }
 
 func main() {
@@ -71,10 +62,6 @@ func main() {
 	if len(ports) == 0 {
 		fmt.Println("Nothing to do")
 		return
-	}
-
-	if !checkFormat() {
-		panic(fmt.Sprintf("Output Format not valid: %s", outputFormat))
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

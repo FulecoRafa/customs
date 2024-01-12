@@ -6,7 +6,6 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"net/http/httputil"
 	"strings"
 	"sync"
 
@@ -22,32 +21,6 @@ func GetId() int64 {
 	id := nextId
 	nextId++
 	return id
-}
-
-func StringRequest(req *http.Request) string {
-	str := "Could not dump request"
-	switch outputFormat {
-	case "http":
-		bytes, err := httputil.DumpRequest(req, true)
-		if err != nil {
-			break
-		}
-		str = string(bytes)
-	}
-	return str
-}
-
-func StringResponse(resp *http.Response) string {
-    str := "Could not dump response"
-    switch outputFormat {
-    case "http":
-        bytes, err := httputil.DumpResponse(resp, true)
-        if err != nil {
-            break
-        }
-        str = string(bytes)
-    }
-    return str
 }
 
 func CopyHeaders(src http.Header, dst *http.Header) {
@@ -94,8 +67,6 @@ func (p *proxy) SetProxyHeader(req *http.Request) {
 // ServeHTTP implements http.Handler.
 func (p *proxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	id := GetId()
-	reqStr := StringRequest(req)
-	slog.Info(reqStr, "id", id)
 
 	// Remove original URL for redirect
 	req.RequestURI = ""
@@ -108,7 +79,7 @@ func (p *proxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
         req.URL.Scheme = "https"
     }
 
-	// Remove connectino headers
+	// Remove connection headers
 	// (will be replaced by redirect client)
 	p.DropHopHeaders(&req.Header)
 
@@ -124,8 +95,6 @@ func (p *proxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
     }
     defer resp.Body.Close()
 
-    respStr := StringResponse(resp)
-    slog.Info(respStr, "id", id)
 
     // Once again, remove connection headers
     p.DropHopHeaders(&resp.Header)
