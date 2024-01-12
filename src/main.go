@@ -43,15 +43,19 @@ var ports lib.Redirects
 
 var logFormat string
 
+var configFilePath string
+
 func init() {
 	flag.Var(&ports, "r", "Lists of ports redirecting to URLs in format 'port:url'")
 	flag.Var(&ports, "redirect", "Lists of ports redirecting to URLs in format 'port:url'")
 	flag.BoolVar(&isDebug, "debug", false, "Print debug logs")
     flag.StringVar(&logFormat, "l", "kv", "Log format. One of: json; kv")
     flag.StringVar(&logFormat, "logs", "kv", "Log format. One of: json; kv")
-}
+    flag.StringVar(&configFilePath, "config", "example_config.json", "Path to config file. Defaults to '~/.config/customs/config.json'")
 
+    LoadPlugins(configFilePath)
 
+    RegisterPluginFlags()
 }
 
 func main() {

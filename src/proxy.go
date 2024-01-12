@@ -67,6 +67,7 @@ func (p *proxy) SetProxyHeader(req *http.Request) {
 // ServeHTTP implements http.Handler.
 func (p *proxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	id := GetId()
+    RunPreRequestHooks(req, p.redirect)
 
 	// Remove original URL for redirect
 	req.RequestURI = ""
@@ -95,6 +96,7 @@ func (p *proxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
     }
     defer resp.Body.Close()
 
+    RunPostRequestHooks(resp, p.redirect)
 
     // Once again, remove connection headers
     p.DropHopHeaders(&resp.Header)
