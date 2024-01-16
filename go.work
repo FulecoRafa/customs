@@ -1,7 +1,8 @@
-go 1.21.5
+go 1.21.6
 
 use (
 	./lib
+	./plugins/src/inject-header
 	./plugins/src/log
 	./src
 )
